@@ -104,11 +104,31 @@ class SkolmatCard extends LitElement {
 
   renderToday() {
     const stateObj = this.hass.states[this._config.entity];
+    let week = this.getWeekCalendar();
+    let today = "Idag"
+    let menu = "Idag serveras ingen mat";
+    let todayDate = new Date()
+    todayDate.setUTCHours(0, 0, 0, 0);
+    
+    for (const day of week.days){
+      let date = new Date(day.date)
+      date.setUTCHours(0, 0, 0, 0);
+      if (date.getTime() === todayDate.getTime()) {
+        today = `${day.weekday} v${day.week}`;
+        menu = day.courses.map(function(course){
+          return html`<div class="course">${course}</div>`;
+        })
+      }
+    }
+
     return html`
-      <div class="title">${stateObj.attributes.friendly_name} Meny Idag</div>
+      <div class="title">${stateObj.attributes.friendly_name} ${today}</div>
+        <div class="day">
+          <div class="course">${menu}</div>
+        </div>
       `;
   }
-  
+
   getWeekCalendar() {
     const stateObj = this.hass.states[this._config.entity];
     const calendar = stateObj.attributes.calendar;
