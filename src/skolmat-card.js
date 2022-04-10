@@ -103,36 +103,49 @@ class SkolmatCard extends LitElement {
   }
 
   renderToday() {
+
     const stateObj = this.hass.states[this._config.entity];
-    let week = this.getWeekCalendar();
+    let weekNo = this.getWeek(); // week starts on monday
     let today = "Idag"
     let menu = "Idag serveras ingen mat";
-    let todayDate = new Date()
-    todayDate.setUTCHours(0, 0, 0, 0);
-    
-    for (const day of week.days){
-      let date = new Date(day.date)
-      date.setUTCHours(0, 0, 0, 0);
-      if (date.getTime() === todayDate.getTime()) {
-        today = `${day.weekday} v${day.week}`;
-        menu = day.courses.map(function(course){
-          return html`<div class="course">${course}</div>`;
-        })
-      }
-    }
 
-    return html`
-      <div class="title">${stateObj.attributes.friendly_name} ${today}</div>
-        <div class="day">
-          <div class="course">${menu}</div>
-        </div>
-      `;
+    try {
+
+      let week = this.getWeekCalendar(weekNo);
+      let todayDate = new Date()
+      todayDate.setUTCHours(0, 0, 0, 0);
+      
+      for (const day of week.days){
+        let date = new Date(day.date)
+        date.setUTCHours(0, 0, 0, 0);
+        if (date.getTime() === todayDate.getTime()) {
+          today = `${day.weekday} v${day.week}`;
+          menu = day.courses.map(function(course){
+            return html`<div class="course">${course}</div>`;
+          })
+        }
+      }
+      return html`
+        <div class="title">${stateObj.attributes.friendly_name} ${today}</div>
+          <div class="day">
+            <div class="course">${menu}</div>
+          </div>
+        `;
+    }
+    catch (err) {
+      console.error(err);
+      return html`
+          <div class="title">${stateObj.attributes.friendly_name} ${today}</div>
+            <div class="day">
+              <div class="course">Det finns ingen meny för vecka ${weekNo}</div>
+            </div>
+          </div>`
+    }
   }
 
-  getWeekCalendar() {
-    const stateObj = this.hass.states[this._config.entity];
-    const calendar = stateObj.attributes.calendar;
-    
+
+  getWeek() {
+
     let date = new Date();
 
     let weekDay = (new Date()).getDay(); // 0-6, Sunday = 0
@@ -141,11 +154,17 @@ class SkolmatCard extends LitElement {
     else if (weekDay == 0)
       date.setDate(date.getDate() + 1)
 
-    let week = date.getWeek(); // week starts on monday
+    return date.getWeek(); // week starts on monday
+
+  }
+
+  getWeekCalendar(week) {
+    const stateObj = this.hass.states[this._config.entity];
+    const calendar = stateObj.attributes.calendar;
 
     if (!calendar.hasOwnProperty(week))
-      throw new Error (`${this._config.entity} attribute calendar has no week ${week}`)
-    
+      throw new Error (`${this._config.entity} calendar has no week ${week}`)
+
     return {
       'week': week, 
       'days':calendar[week]
@@ -153,20 +172,34 @@ class SkolmatCard extends LitElement {
   }
 
   renderWeek() {
+    
     const stateObj = this.hass.states[this._config.entity];
-    const calendar = this.getWeekCalendar()
-    return html`
-        <div class="title">${stateObj.attributes.friendly_name} Meny v${calendar.week}</div>
-        ${calendar.days.map(function(day) {
-          return html`<div class="day">
-            <div class="dayname">${day.weekday}</div>
-            ${day.courses.map(function(course){
-              return html`<div class="course">${course}</div>`;
-            })}
-          </div>`;
-        })}
-      `;
+    let week = this.getWeek();
+
+    try {
+      const calendar = this.getWeekCalendar(week)
+      return html`
+          <div class="title">${stateObj.attributes.friendly_name} Meny v${week}</div>
+          ${calendar.days.map(function(day) {
+            return html`<div class="day">
+              <div class="dayname">${day.weekday}</div>
+              ${day.courses.map(function(course){
+                return html`<div class="course">${course}</div>`;
+              })}
+            </div>`;
+          })}
+        `;
     }
+    catch (err) {
+      console.error(err);
+      return html`
+          <div class="title">${stateObj.attributes.friendly_name} Meny v${week}</div>
+            <div class="day">
+              <div class="course">Det finns ingen meny för vecka ${week}</div>
+            </div>
+          </div>`
+    }
+  }
 
   getCardSize() {
     return 3;
