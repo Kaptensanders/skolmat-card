@@ -21,8 +21,3 @@ This card was developed and tested with HA Core 2021.12.10 and the skolmat custo
     entity: skolmat.skutehagen
     menu_type: today # [today or week]
 ```
-  
-## TODO:
-* HACS installation 
-
-  
