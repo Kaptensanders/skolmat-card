@@ -11,11 +11,8 @@ This card was developed and tested with HA Core 2021.12.10 and the skolmat custo
 
 ## Installation
 1. Install the skolmat custom component (https://github.com/Kaptensanders/skolmat)
-2. Put the contents of this repo in `.../<ha config>/www/skolmat-card/` (or clone this repo to your www folder)
-3. In UI, go to Configuration->Dashboards->Resources and add a new entry:
-   `/local/skolmat-card/src/skolmat-card.js?v=1.0.0`
-4. Reload browser UI
-5. Add the card to lovelace config:
+2. Install this card with HACS
+3. Add the card to lovelace config:
 ```yaml
   - type: custom:skolmat-card
     entity: skolmat.skutehagen
