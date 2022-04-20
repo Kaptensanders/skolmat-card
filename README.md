@@ -6,9 +6,6 @@ This custom card is valid in Sweden. It depends on the skolmat custom component 
 
 ![image](https://user-images.githubusercontent.com/24979195/154963878-013bb9c0-80df-4449-9a8e-dc54ef0a3271.png)
 
-## Dev status
-This card was developed and tested with HA Core 2021.12.10 and the skolmat custom component 1.0.0. 
-
 ## Installation
 1. Install the skolmat custom component (https://github.com/Kaptensanders/skolmat)
 2. Install this card with HACS
