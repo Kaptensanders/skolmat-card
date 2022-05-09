@@ -162,6 +162,9 @@ class SkolmatCard extends LitElement {
     const stateObj = this.hass.states[this._config.entity];
     const calendar = stateObj.attributes.calendar;
 
+    if (!calendar)
+      throw new Error (`${this._config.entity} attributes does not contain a calendar`)
+
     if (!calendar.hasOwnProperty(week))
       throw new Error (`${this._config.entity} calendar has no week ${week}`)
 
