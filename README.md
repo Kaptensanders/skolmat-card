@@ -8,10 +8,17 @@ This custom card is valid in Sweden. It depends on the skolmat custom component 
 
 ## Installation
 1. Install the skolmat custom component (https://github.com/Kaptensanders/skolmat)
-2. Install this card with HACS
+2. Install this card with HACS, or manually put skolmat-card.js in your www folder and add as resource.
 3. Add the card to lovelace config:
-```yaml
+```
   - type: custom:skolmat-card
     entity: skolmat.skutehagen
     menu_type: today # [today or week]
 ```
+
+## Reporting problems
+In the issue, please add:
+  * Any relevant messages from the HA log
+  * Your config entry for the sensor entity
+  * The sensor attributes. Screenshot or plain text.
+  * Any relevant output from the browser dev tools console
