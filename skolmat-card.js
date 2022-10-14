@@ -56,13 +56,20 @@ class SkolmatCard extends LitElement {
     document.head.appendChild(fontEl);
   }
 
-  setConfig(config) {
-    if (!config.entity) {
+  setConfig(conf) {
+
+    let config = {...conf}
+    if (!config.entity)
       throw new Error("Please define a skolmat entity");
-    }
-    else if (!config.menu_type || (config.menu_type != "today" && config.menu_type != "week")) {
-      throw new Error("config: 'menu_type' missing or not 'today' or 'week");
-    }
+    
+    config.menu_type = config.menu_type ? config.menu_type : "week"
+    if (config.menu_type != "today" && config.menu_type != "week")
+      throw new Error("Options for 'menu_type' config parameter must be week or today. Got: " + config.menu_type);
+    
+    config.header = config.header ? config.header : "full"
+    if (config.header != "none" && config.header != "short" && config.header != "full")
+        throw new Error("Options for 'header' config parameter must be full, short or none. Got: " + config.header);
+    
     this._config = config;
   }
 
@@ -95,13 +102,25 @@ class SkolmatCard extends LitElement {
       `;
     }
 
-    return html`
-      <ha-card>
-        ${this._config.menu_type == "today" ? this.renderToday() : this.renderWeek()}
-      </ha-card>
-    `;
+    if (this._config.menu_type == "today")
+      return html`<ha-card><div class="menu today">${this.renderToday()}</div></ha-card>`
+    else
+      return html`<ha-card><div class="menu week">${this.renderWeek()}</div></ha-card>`
   }
 
+  getHeader (timePeriod) {
+    const stateObj = this.hass.states[this._config.entity];
+    if (this._config.header == "none" )
+      return ''
+    else {
+      let header = this._config.menu_type == "today" ? timePeriod : 'Meny ' + timePeriod
+      if (this._config.header == "short" )
+        return html`<div class="title">${header}</div>`
+      else
+        return html`<div class="title">${stateObj.attributes.friendly_name} ${header}</div>`
+    }
+
+  } 
   renderToday() {
 
     const stateObj = this.hass.states[this._config.entity];
@@ -126,23 +145,55 @@ class SkolmatCard extends LitElement {
         }
       }
       return html`
-        <div class="title">${stateObj.attributes.friendly_name} ${today}</div>
-          <div class="day">
-            <div class="course">${menu}</div>
-          </div>
+        ${this.getHeader(today)}
+        <div class="day">
+          <div class="course">${menu}</div>
+        </div>
         `;
     }
     catch (err) {
       console.error(err);
       return html`
-          <div class="title">${stateObj.attributes.friendly_name} ${today}</div>
-            <div class="day">
-              <div class="course">Det finns ingen meny för vecka ${weekNo}</div>
-            </div>
+          ${this.getHeader(today)}
+          <div class="day">
+            <div class="course">Det finns ingen meny för vecka ${weekNo}</div>
+          </div>`
+    }
+    // <div class="title">${stateObj.attributes.friendly_name} ${today}</div>
+  }
+
+  renderWeek() {
+    
+    const stateObj = this.hass.states[this._config.entity];
+    let week = this.getWeek();
+
+    try {
+      const calendar = this.getWeekCalendar(week)
+      return html`
+
+          ${this.getHeader('v'+ week)}
+          ${calendar.days.map(function(day) {
+            return html`<div class="day">
+              <div class="dayname">${day.weekday}</div>
+              ${day.courses.map(function(course){
+                return html`<div class="course">${course}</div>`;
+              })}
+            </div>`;
+          })}`;
+    }
+    catch (err) {
+      console.error(err);
+      return html`
+          ${this.getHeader('v'+ week)}
+          <div class="day">
+            <div class="course">Det finns ingen meny för vecka ${week}</div>
           </div>`
     }
   }
 
+  getCardSize() {
+    return 3;
+  }
 
   getWeek() {
 
@@ -174,39 +225,6 @@ class SkolmatCard extends LitElement {
     };
   }
 
-  renderWeek() {
-    
-    const stateObj = this.hass.states[this._config.entity];
-    let week = this.getWeek();
-
-    try {
-      const calendar = this.getWeekCalendar(week)
-      return html`
-          <div class="title">${stateObj.attributes.friendly_name} Meny v${week}</div>
-          ${calendar.days.map(function(day) {
-            return html`<div class="day">
-              <div class="dayname">${day.weekday}</div>
-              ${day.courses.map(function(course){
-                return html`<div class="course">${course}</div>`;
-              })}
-            </div>`;
-          })}
-        `;
-    }
-    catch (err) {
-      console.error(err);
-      return html`
-          <div class="title">${stateObj.attributes.friendly_name} Meny v${week}</div>
-            <div class="day">
-              <div class="course">Det finns ingen meny för vecka ${week}</div>
-            </div>
-          </div>`
-    }
-  }
-
-  getCardSize() {
-    return 3;
-  }
 
   static get styles() {
     return css`
@@ -233,9 +251,12 @@ class SkolmatCard extends LitElement {
       }
 
       div.day {
-        text-align: center;
-        margin-top: 10px
+        text-align: center;        
       }
+      
+      div.day:nth-child(n+2) { margin-top: 10px }
+      div.menu.today div.day { margin-top: 0 }
+
       div.day div.dayname {
         font-weight: bold;
       }

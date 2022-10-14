@@ -14,6 +14,7 @@ This custom card is valid in Sweden. It depends on the skolmat custom component 
   - type: custom:skolmat-card
     entity: skolmat.skutehagen
     menu_type: today # [today or week]
+    header: full # [full, short or none]
 ```
 
 ## Reporting problems
