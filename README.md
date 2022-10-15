@@ -15,14 +15,17 @@ This custom card is valid in Sweden. It depends on the skolmat custom component 
     entity: skolmat.skutehagen
     menu_type: today # [today or week]
     header: full # [full, short or none]
-    header_fontname: Inspiration # [none or font family name]
-    header_fonturl: https://fonts.googleapis.com/css2?family=Inspiration&display=swap
+    header_font: https://fonts.googleapis.com/css2?family=Inspiration&display=swap
     header_fontsize: 2em
 ```
+## Lovelace configuration options
 
-## Reporting problems
-In the issue, please add:
-  * Any relevant messages from the HA log
-  * Your config entry for the sensor entity
-  * The sensor attributes. Screenshot or plain text.
-  * Any relevant output from the browser dev tools console
+| Option           | Supported values           | Default                                             | Description                                  |
+|------------------|----------------------------|-----------------------------------------------------|----------------------------------------------|
+|`type`            |`custom:skolmat-card`       |**Required**                                         |The card type                                |
+|`entity`          |*skolmat entity id*         |**Required**                                         |Entity id, like `skolmat.nibbleskolan`       |
+|`menu_type`       |`today`, `week`             | `week`                                              |Show today only or full week menu            |
+|`header`          |`full`, `short`, `none`     | `full`                                              |`full` - School name and time span <br>`short` - Time span <br> `none` - No header  |
+|`header_font`     |*google fonts url*          |`https://fonts.googleapis.com/css?family=Mea+Culpa`  |The `href` parameter of the link tag provided at google fonts site|
+|`header_fontsize` |`2em`, `20px`, etc          |`1.5em`                                              | any valid css size specifier                 |
+
