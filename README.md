@@ -15,6 +15,9 @@ This custom card is valid in Sweden. It depends on the skolmat custom component 
     entity: skolmat.skutehagen
     menu_type: today # [today or week]
     header: full # [full, short or none]
+    header_fontname: Inspiration # [none or font family name]
+    header_fonturl: https://fonts.googleapis.com/css2?family=Inspiration&display=swap
+    header_fontsize: 2em
 ```
 
 ## Reporting problems

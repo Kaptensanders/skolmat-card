@@ -50,10 +50,6 @@ class SkolmatCard extends LitElement {
 
   constructor() {
     super();
-    const fontEl = document.createElement('link');
-    fontEl.rel = 'stylesheet';
-    fontEl.href = 'https://fonts.googleapis.com/css?family=Mea Culpa';
-    document.head.appendChild(fontEl);
   }
 
   setConfig(conf) {
@@ -62,15 +58,32 @@ class SkolmatCard extends LitElement {
     if (!config.entity)
       throw new Error("Please define a skolmat entity");
     
-    config.menu_type = config.menu_type ? config.menu_type : "week"
+    config.menu_type = config.menu_type ? config.menu_type : "week";
     if (config.menu_type != "today" && config.menu_type != "week")
       throw new Error("Options for 'menu_type' config parameter must be week or today. Got: " + config.menu_type);
     
-    config.header = config.header ? config.header : "full"
+    config.header = config.header ? config.header : "full";
     if (config.header != "none" && config.header != "short" && config.header != "full")
         throw new Error("Options for 'header' config parameter must be full, short or none. Got: " + config.header);
     
-    this._config = config;
+    if (!config.header_font) {
+      config.header_font = "https://fonts.googleapis.com/css?family=Mea Culpa";
+      config.header_fontsize = "2em";
+    }
+    if (config.header_font != "none") {
+      let queryString = config.header_font.substring(config.header_font.indexOf('?') + 1);
+      const urlParams = new URLSearchParams(queryString);
+      if (!urlParams.has("family"))
+          throw new Error("header_font url needs to contain the 'family' query string parameter, providing the ccs font-family attribute"); 
+      config.header_fontname = urlParams.get("family")
+
+      const fontEl = document.createElement('link');
+      fontEl.rel = 'stylesheet';
+      fontEl.href = config.header_font
+      document.head.appendChild(fontEl);
+    }
+
+    this._config = config;  
   }
 
   shouldUpdate(changedProps) {
@@ -109,15 +122,22 @@ class SkolmatCard extends LitElement {
   }
 
   getHeader (timePeriod) {
+
+    let style = '';
+    if (this._config.header_font != "none")
+      style += "font-family:" + this._config.header_fontname + ";";
+    if (this._config.header_fontsize)
+      style += "font-size:" + this._config.header_fontsize + ";";
+
     const stateObj = this.hass.states[this._config.entity];
     if (this._config.header == "none" )
       return ''
     else {
       let header = this._config.menu_type == "today" ? timePeriod : 'Meny ' + timePeriod
       if (this._config.header == "short" )
-        return html`<div class="title">${header}</div>`
+        return html`<div class="title" style="${style}">${header}</div>`
       else
-        return html`<div class="title">${stateObj.attributes.friendly_name} ${header}</div>`
+        return html`<div class="title" style="${style}">${stateObj.attributes.friendly_name} ${header}</div>`
     }
 
   } 
@@ -239,12 +259,10 @@ class SkolmatCard extends LitElement {
         box-sizing: border-box;
       }
       div.title {
-        font-family: 'Mea Culpa';
-        font-size: 2em;
         text-align: center;
-        font-size: 2em;
         padding-top: 25px;
         padding-bottom:15px; 
+        font-size: 1.5em
       }
       div.title:first-child {
         padding-top: 0;
