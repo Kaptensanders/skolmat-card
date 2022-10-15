@@ -1,3 +1,6 @@
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+![Maintenance](https://img.shields.io/maintenance/yes/2022?style=for-the-badge)
+
 # skolmat-card custom card for Lovelace, Home Assistant 
 A Lovelace card to present the current food menu in Swedish schools
 
