@@ -29,6 +29,6 @@ This custom card is valid in Sweden. It depends on the skolmat custom component 
 |`entity`          |*skolmat entity id*         |**Required**                                         |Entity id, like `skolmat.nibbleskolan`       |
 |`menu_type`       |`today`, `week`             | `week`                                              |Show today only or full week menu            |
 |`header`          |`full`, `short`, `none`     | `full`                                              |`full` - School name and time span <br>`short` - Time span <br> `none` - No header  |
-|`header_font`     |*google fonts url*          |`https://fonts.googleapis.com/css?family=Mea+Culpa`  |The `href` parameter of the link tag provided at google fonts site|
+|`header_font`     |*google fonts url* or <br>`none` for theme font          |`https://fonts.googleapis.com/css?family=Mea+Culpa`  |The `href` parameter of the link tag provided at google fonts site|
 |`header_fontsize` |`2em`, `20px`, etc          |`1.5em`                                              | any valid css size specifier                 |
 
