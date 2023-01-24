@@ -16,12 +16,12 @@ This custom card is valid in Sweden. It depends on the skolmat custom component 
 2. Install this card with HACS, or manually put skolmat-card.js in your www folder and add as resource.
 3. Add the card to lovelace config:
 ```
-  - type: custom:skolmat-card
-    entity: skolmat.skutehagen
-    menu_type: today # [today or week]
-    header: full # [full, short or none]
-    header_font: https://fonts.googleapis.com/css2?family=Inspiration&display=swap
-    header_fontsize: 2em
+type: custom:skolmat-card
+entity: skolmat.skutehagen
+menu_type: today # [today or week]
+header: full # [full, short or none]
+header_font: https://fonts.googleapis.com/css2?family=Inspiration&display=swap
+header_fontsize: 2em
 ```
 ## Lovelace configuration options
 
