@@ -63,8 +63,8 @@ class SkolmatCard extends LitElement {
       throw new Error("Options for 'menu_type' config parameter must be week or today. Got: " + config.menu_type);
     
     config.header = config.header ? config.header : "full";
-    if (config.header != "none" && config.header != "short" && config.header != "full")
-        throw new Error("Options for 'header' config parameter must be full, short or none. Got: " + config.header);
+    if (config.header != "none" && config.header != "short" && config.header != "full" && config.header != "school-name")
+        throw new Error("Options for 'header' config parameter must be full, short, school-name, or none. Got: " + config.header);
     
     if (!config.header_font) {
       config.header_font = "https://fonts.googleapis.com/css?family=Mea Culpa";
@@ -136,6 +136,8 @@ class SkolmatCard extends LitElement {
       let header = this._config.menu_type == "today" ? timePeriod : 'Meny ' + timePeriod
       if (this._config.header == "short" )
         return html`<div class="title" style="${style}">${header}</div>`
+      if (this._config.header == "school-name" )
+        return html`<div class="title" style="${style}">${stateObj.attributes.friendly_name}</div>`
       else
         return html`<div class="title" style="${style}">${stateObj.attributes.friendly_name} ${header}</div>`
     }

@@ -18,7 +18,7 @@ This custom card is valid in Sweden. It depends on the skolmat custom component 
 type: custom:skolmat-card
 entity: skolmat.skutehagen
 menu_type: today # [today or week]
-header: full # [full, short or none]
+header: full # [full, short, school-name or none]
 header_font: https://fonts.googleapis.com/css2?family=Inspiration&display=swap
 header_fontsize: 2em
 ```
@@ -29,7 +29,7 @@ header_fontsize: 2em
 |`type`            |`custom:skolmat-card`       |**Required**                                         |The card type                                |
 |`entity`          |*skolmat entity id*         |**Required**                                         |Entity id, like `skolmat.nibbleskolan`       |
 |`menu_type`       |`today`, `week`             | `week`                                              |Show today only or full week menu            |
-|`header`          |`full`, `short`, `none`     | `full`                                              |`full` - School name and time span <br>`short` - Time span <br> `none` - No header  |
+|`header`          |`full`, `short`, `school-name`, `none`     | `full`                                              |`full` - School name and time span <br>`short` - Time span <br> `school-name` - School name <br>`none` - No header  |
 |`header_font`     |*google fonts url* or <br>`none` for theme font          |`https://fonts.googleapis.com/css?family=Mea+Culpa`  |The `href` parameter of the link tag provided at google fonts site|
 |`header_fontsize` |`2em`, `20px`, etc          |`1.5em`                                              | any valid css size specifier                 |
 
