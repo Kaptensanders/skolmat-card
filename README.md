@@ -23,12 +23,13 @@ header_fontsize: 2em
 ```
 ## Lovelace configuration options
 
-| Option           | Supported values           | Default                                             | Description                                  |
-|------------------|----------------------------|-----------------------------------------------------|----------------------------------------------|
+| Option           | Supported values           | Default                                             | Description                                 |
+|------------------|----------------------------|-----------------------------------------------------|---------------------------------------------|
 |`type`            |`custom:skolmat-card`       |**Required**                                         |The card type                                |
 |`entity`          |*skolmat entity id*         |**Required**                                         |Entity id, like `skolmat.nibbleskolan`       |
 |`menu_type`       |`today`, `week`             | `week`                                              |Show today only or full week menu            |
 |`header`          |`full`, `short`, `school-name`, `none`     | `full`                                              |`full` - School name and time span <br>`short` - Time span <br> `school-name` - School name <br>`none` - No header  |
 |`header_font`     |*google fonts url* or <br>`none` for theme font          |`https://fonts.googleapis.com/css?family=Mea+Culpa`  |The `href` parameter of the link tag provided at google fonts site|
-|`header_fontsize` |`2em`, `20px`, etc          |`1.5em`                                              | any valid css size specifier                 |
+|`header_fontsize` |`2em`, `20px`, etc          |`1.5em`                                              | any valid css size specifier                |
+|`show_dates`      |`True`, `false`             | `False`                                             |Show dates after weekday                     |
 

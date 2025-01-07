@@ -59,13 +59,15 @@ class SkolmatCard extends LitElement {
       throw new Error("Please define a skolmat entity");
     
     config.menu_type = config.menu_type ? config.menu_type : "week";
-    if (config.menu_type != "today" && config.menu_type != "week")
-      throw new Error("Options for 'menu_type' config parameter must be week or today. Got: " + config.menu_type);
-    
+    if (config.menu_type != "today" && config.menu_type != "week" && config.menu_type != "rolling-week")
+      throw new Error("Options for 'menu_type' config parameter must be today, week or rolling-week. Got: " + config.menu_type);
+        
     config.header = config.header ? config.header : "full";
     if (config.header != "none" && config.header != "short" && config.header != "full" && config.header != "school-name")
         throw new Error("Options for 'header' config parameter must be full, short, school-name, or none. Got: " + config.header);
     
+    config.show_dates = config.show_dates ? true : false;
+
     if (!config.header_font) {
       config.header_font = "https://fonts.googleapis.com/css?family=Mea Culpa";
       config.header_fontsize = "2em";
@@ -181,7 +183,6 @@ class SkolmatCard extends LitElement {
             <div class="course">Det finns ingen meny för vecka ${weekNo}</div>
           </div>`
     }
-    // <div class="title">${stateObj.attributes.friendly_name} ${today}</div>
   }
 
   renderWeek() {
@@ -194,9 +195,17 @@ class SkolmatCard extends LitElement {
       return html`
 
           ${this.getHeader('v'+ week)}
-          ${calendar.days.map(function(day) {
+          ${calendar.days.map((day) => {
+            
+            let dateStr = ""
+            if (this._config.show_dates) {
+
+              let date = new Date(day.date);
+              dateStr = ` - ${date.getDate()}/${date.getMonth() + 1}`
+            }
+
             return html`<div class="day">
-              <div class="dayname">${day.weekday}</div>
+              <div class="dayname">${day.weekday}${dateStr}</div>
               ${day.courses.map(function(course){
                 return html`<div class="course">${course}</div>`;
               })}
@@ -228,7 +237,6 @@ class SkolmatCard extends LitElement {
       date.setDate(date.getDate() + 1)
 
     return date.getWeek(); // week starts on monday
-
   }
 
   getWeekCalendar(week) {
@@ -246,7 +254,6 @@ class SkolmatCard extends LitElement {
       'days':calendar[week]
     };
   }
-
 
   static get styles() {
     return css`
