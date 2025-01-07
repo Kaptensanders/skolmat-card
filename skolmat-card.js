@@ -65,7 +65,12 @@ class SkolmatCard extends LitElement {
     config.header = config.header ? config.header : "full";
     if (config.header != "none" && config.header != "short" && config.header != "full" && config.header != "school-name")
         throw new Error("Options for 'header' config parameter must be full, short, school-name, or none. Got: " + config.header);
-    
+
+    config.rolling_week_max_days = config.rolling_week_max_days ? config.rolling_week_max_days : 5;
+    if (!Number.isInteger(config.rolling_week_max_days) || config.rolling_week_max_days < 1 || config.rolling_week_max_days > 10)
+        throw new Error("Options for 'rolling_week_max_days' config parameter must be an integer between 1 and 10. Got: " + config.rolling_week_max_days);
+
+
     config.show_dates = config.show_dates ? true : false;
 
     if (!config.header_font) {
@@ -194,11 +199,11 @@ class SkolmatCard extends LitElement {
       const calendar = this.getWeekCalendar(week)
       return html`
 
-          ${this.getHeader('v'+ week)}
+          ${this.getHeader(this._config.menu_type == "rolling-week" ? "" : 'v'+ week)}
           ${calendar.days.map((day) => {
             
             let dateStr = ""
-            if (this._config.show_dates) {
+            if (this._config.show_dates || this._config.menu_type == "rolling-week") {
 
               let date = new Date(day.date);
               dateStr = ` - ${date.getDate()}/${date.getMonth() + 1}`
@@ -249,9 +254,27 @@ class SkolmatCard extends LitElement {
     if (!calendar.hasOwnProperty(week))
       throw new Error (`${this._config.entity} calendar has no week ${week}`)
 
+    let days = calendar[week]
+    if (this._config.menu_type == "rolling-week") {
+
+      const today = new Date()
+      today.setHours(0, 0, 0, 0);
+
+      const allDays = Object.values(calendar).flat();
+
+      // Filter items with dates today or later
+      const futureDays = allDays.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate >= today;
+      });
+    
+      days = futureDays.slice(0, this._config.rolling_week_max_days);
+    }
+
+
     return {
       'week': week, 
-      'days':calendar[week]
+      'days': days
     };
   }
 
