@@ -61,7 +61,6 @@ views:
         menu_type: week
         header: full
 
-
       - type: custom:skolmat-card
         entity: skolmat.skolmaten_se_stadastadsskogen_skola
         menu_type: today
@@ -70,6 +69,17 @@ views:
         entity: skolmat.skolmaten_se_stadastadsskogen_skola
         menu_type: week
         header: full
+
+      - type: custom:skolmat-card
+        entity: skolmat.mateo_se_kavlinge_utbildning
+        menu_type: today
+        header: full
+      - type: custom:skolmat-card
+        entity: skolmat.mateo_se_kavlinge_utbildning
+        menu_type: week
+        header: full
+
+
 
 
 
