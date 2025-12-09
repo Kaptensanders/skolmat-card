@@ -80,6 +80,10 @@ views:
         header: full
 
 
+      - type: custom:skolmat-card
+        entity: skolmat.menu_matildaplatform_com_dalajars_forskola
+        menu_type: week
+        header: full
 
 
 
