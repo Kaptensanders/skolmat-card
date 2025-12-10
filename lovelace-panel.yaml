@@ -35,53 +35,53 @@ views:
         rolling_week_max_days: 10
 
       - type: custom:skolmat-card
-        entity: skolmat.foodit_se_backaskolan
+        entity: sensor.foodit_se_backaskolan
         menu_type: today
         header: full
       - type: custom:skolmat-card
-        entity: skolmat.foodit_se_backaskolan
+        entity: sensor.foodit_se_backaskolan
         menu_type: week
         header: full
 
       - type: custom:skolmat-card
-        entity: skolmat.mpi_mashie_com_kyrkebyskolan
+        entity: sensor.mpi_mashie_com_kyrkebyskolan
         menu_type: today
         header: full
       - type: custom:skolmat-card
-        entity: skolmat.mpi_mashie_com_kyrkebyskolan
+        entity: sensor.mpi_mashie_com_kyrkebyskolan
         menu_type: week
         header: full
 
       - type: custom:skolmat-card
-        entity: skolmat.mpi_mashie_com_scheeleskolan
+        entity: sensor.mpi_mashie_com_scheeleskolan
         menu_type: today
         header: full
       - type: custom:skolmat-card
-        entity: skolmat.mpi_mashie_com_scheeleskolan
+        entity: sensor.mpi_mashie_com_scheeleskolan
         menu_type: week
         header: full
 
       - type: custom:skolmat-card
-        entity: skolmat.skolmaten_se_stadastadsskogen_skola
+        entity: sensor.skolmaten_se_stadastadsskogen_skola
         menu_type: today
         header: full
       - type: custom:skolmat-card
-        entity: skolmat.skolmaten_se_stadastadsskogen_skola
+        entity: sensor.skolmaten_se_stadastadsskogen_skola
         menu_type: week
         header: full
 
       - type: custom:skolmat-card
-        entity: skolmat.mateo_se_kavlinge_utbildning
+        entity: sensor.mateo_se_kavlinge_utbildning
         menu_type: today
         header: full
       - type: custom:skolmat-card
-        entity: skolmat.mateo_se_kavlinge_utbildning
+        entity: sensor.mateo_se_kavlinge_utbildning
         menu_type: week
         header: full
 
 
       - type: custom:skolmat-card
-        entity: skolmat.menu_matildaplatform_com_dalajars_forskola
+        entity: sensor.menu_matildaplatform_com_dalajars_forskola
         menu_type: week
         header: full
 
