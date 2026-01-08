@@ -15,7 +15,7 @@ This custom card is valid in Sweden. It depends on the skolmat custom component 
 3. Add the card to lovelace config:
 ```
 type: custom:skolmat-card
-entity: skolmat.skutehagen
+entity: sensor.skutehagen
 menu_type: today # [today or week]
 header: full # [full, short, school-name or none]
 header_font: https://fonts.googleapis.com/css2?family=Inspiration&display=swap
@@ -32,4 +32,4 @@ header_fontsize: 2em
 |`header_font`              |*google fonts url* or <br>`none` for theme font          |`https://fonts.googleapis.com/css?family=Mea+Culpa`  |The `href` parameter of the link tag provided at google fonts site|
 |`header_fontsize`          |`2em`, `20px`, etc          |`1.5em`                                              | any valid css size specifier                    |
 |`show_dates`               |`True`, `false`             | `False`                                             |Show dates after weekday (Always shown for rolling-week)  |
-|`rolling_week_max_days`    |`intger 1 to 10`            | `5`                                                 |Number of days to show for rolling-week's  |
+|`rolling_week_max_days`    |`intger 1 to 10`            | `5`                                                 |Number of days to show for rolling-week  |
