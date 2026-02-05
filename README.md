@@ -4,6 +4,9 @@
 # skolmat-card custom card for Lovelace, Home Assistant 
 A Lovelace card to present the current food menu in Swedish schools
 
+**2.0.0 Note:** Requires the `skolmat` integration version **3.0.0** or higher.
+
+
 ## Description
 This custom card is valid in Sweden. It depends on the skolmat custom component (https://github.com/Kaptensanders/skolmat) that populates entities from school menu rss feeds.
 
@@ -16,10 +19,15 @@ This custom card is valid in Sweden. It depends on the skolmat custom component 
 ```
 type: custom:skolmat-card
 entity: skolmat.skutehagen
-menu_type: today # [today or week]
+menu_type: today # [today, week, rolling-week]
 header: full # [full, short, school-name or none]
 header_font: https://fonts.googleapis.com/css2?family=Inspiration&display=swap
 header_fontsize: 2em
+show_dates: false
+rolling_week_max_days: 5
+show_meals: if-multiple
+show_dish_labels: if-multiple
+locale: default # [default, en, sv]
 ```
 ## Lovelace configuration options
 
@@ -30,6 +38,9 @@ header_fontsize: 2em
 |`menu_type`                |`today`, `week`, `rolling-week` | `week`                                              |Show menu for today only, full current week, or from today and `rolling_week_max_days` forward  |
 |`header`                   |`full`, `short`, `school-name`, `none`     | `full`                                              |`full` - School name and time span <br>`short` - Time span <br> `school-name` - School name <br>`none` - No header  |
 |`header_font`              |*google fonts url* or <br>`none` for theme font          |`https://fonts.googleapis.com/css?family=Mea+Culpa`  |The `href` parameter of the link tag provided at google fonts site|
-|`header_fontsize`          |`2em`, `20px`, etc          |`1.5em`                                              | any valid css size specifier                    |
-|`show_dates`               |`True`, `false`             | `False`                                             |Show dates after weekday (Always shown for rolling-week)  |
-|`rolling_week_max_days`    |`intger 1 to 10`            | `5`                                                 |Number of days to show for rolling-week's  |
+|`header_fontsize`          |`2em`, `20px`, etc          |`2em`                                                |Any valid CSS size specifier                    |
+|`show_dates`               |`true`, `false`             | `false`                                             |Show dates after weekday (always shown for rolling-week)  |
+|`rolling_week_max_days`    |`integer 1 to 10`           | `5`                                                 |Maximum number of days to show for rolling-week (skips empty days)  |
+|`show_meals`               |`none`, `always`, `if-multiple` | `if-multiple`                                    |When to show meal headers                      |
+|`show_dish_labels`         |`none`, `always`, `if-multiple` | `if-multiple`                                    |When to show dish labels                       |
+|`locale`                   |`default`, `en`, `sv`       | `default`                                           |Force card localization or use HA language     |
