@@ -358,8 +358,37 @@ class SkolmatCard extends LitElement {
   _renderWeek(calendar) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const weekStart = startOfIsoWeek(today);
-    const weekNumber = getIsoWeekNumber(today);
+    let weekStart = startOfIsoWeek(today);
+    let weekNumber = getIsoWeekNumber(today);
+
+    if (this._config.menu_type === "week") {
+      const dayOfWeek = today.getDay();
+      const isWeekend = dayOfWeek === 6 || dayOfWeek === 0;
+      if (isWeekend) {
+        const todayIso = toIsoDate(today);
+        const todayEntries = calendar[todayIso] || [];
+        const hasTodayEntries = todayEntries.length > 0;
+
+        if (!hasTodayEntries) {
+          const nextWeekStart = addDays(weekStart, 7);
+          let nextWeekHasEntries = false;
+          for (let i = 0; i < 7; i += 1) {
+            const date = addDays(nextWeekStart, i);
+            const iso = toIsoDate(date);
+            const entries = calendar[iso] || [];
+            if (entries.length > 0) {
+              nextWeekHasEntries = true;
+              break;
+            }
+          }
+
+          if (nextWeekHasEntries) {
+            weekStart = nextWeekStart;
+            weekNumber = getIsoWeekNumber(nextWeekStart);
+          }
+        }
+      }
+    }
 
     const days = [];
     for (let i = 0; i < 5; i += 1) {
