@@ -7,7 +7,7 @@ window.customCards.push({
   type: "skolmat-card",
   name: "Skolmat card",
   description: "Card to display the food menu in swedish schools. Relies on the skolmat integration",
-  preview: false,
+  preview: true,
   documentationURL: "https://github.com/Kaptensanders/skolmat-card",
 });
 
@@ -64,7 +64,76 @@ function getIsoWeekNumber(date) {
   return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
 }
 
+const CARD_DEFAULTS = {
+  menu_type: "week",
+  header: "full",
+  header_font: "https://fonts.googleapis.com/css?family=Mea+Culpa",
+  header_fontsize: "2em",
+  show_dates: false,
+  rolling_week_max_days: 5,
+  show_meals: "if-multiple",
+  show_dish_labels: "if-multiple",
+  locale: "default",
+};
+
+function normalizeEditorConfig(config) {
+  const normalized = {
+    ...CARD_DEFAULTS,
+    ...(config || {}),
+    type: "custom:skolmat-card",
+  };
+
+  if (normalized.rolling_week_max_days !== undefined && normalized.rolling_week_max_days !== null) {
+    normalized.rolling_week_max_days = Number(normalized.rolling_week_max_days);
+  }
+
+  return normalized;
+}
+
+function findSkolmatEntityId(hass) {
+  const states = hass?.states || {};
+  const entityIds = Object.keys(states);
+
+  const withCalendar = entityIds.find((entityId) => {
+    const stateObj = states[entityId];
+    return (
+      entityId.startsWith("sensor.") &&
+      stateObj?.attributes &&
+      Object.prototype.hasOwnProperty.call(stateObj.attributes, "calendar")
+    );
+  });
+  if (withCalendar) {
+    return withCalendar;
+  }
+
+  // Fallback to entity registry metadata when available in the HA frontend state.
+  const entities = hass?.entities || {};
+  const fromRegistry = Object.keys(entities).find((entityId) => {
+    const registryEntry = entities[entityId];
+    return entityId.startsWith("sensor.") && registryEntry?.platform === "skolmat";
+  });
+  if (fromRegistry) {
+    return fromRegistry;
+  }
+
+  return "";
+}
+
 class SkolmatCard extends LitElement {
+  static async getConfigElement() {
+    return document.createElement("skolmat-card-editor");
+  }
+
+  static getStubConfig(hass) {
+    const entity = findSkolmatEntityId(hass);
+
+    return {
+      ...CARD_DEFAULTS,
+      type: "custom:skolmat-card",
+      entity,
+    };
+  }
+
   static get properties() {
     return {
       _config: {},
@@ -410,12 +479,21 @@ class SkolmatCard extends LitElement {
 
     if (this._config.menu_type === "rolling-week") {
       days.length = 0;
-      for (let i = 0; i < this._config.rolling_week_max_days; i += 1) {
-        const date = addDays(today, i);
-        const iso = toIsoDate(date);
+      const todayIso = toIsoDate(today);
+      const sortedIsoDates = Object.keys(calendar)
+        .filter((iso) => iso >= todayIso)
+        .sort();
+
+      for (const iso of sortedIsoDates) {
         const entries = calendar[iso] || [];
-        if (entries.length > 0) {
-          days.push(date);
+        if (entries.length === 0) {
+          continue;
+        }
+
+        const [year, month, day] = iso.split("-").map(Number);
+        days.push(new Date(year, month - 1, day));
+        if (days.length >= this._config.rolling_week_max_days) {
+          break;
         }
       }
     }
@@ -580,3 +658,192 @@ class SkolmatCard extends LitElement {
   }
 }
 customElements.define("skolmat-card", SkolmatCard);
+
+class SkolmatCardEditor extends LitElement {
+  static get properties() {
+    return {
+      hass: {},
+      _config: {},
+    };
+  }
+
+  constructor() {
+    super();
+    this._computeLabel = this._computeLabel.bind(this);
+    this._onValueChanged = this._onValueChanged.bind(this);
+  }
+
+  setConfig(config) {
+    this._config = normalizeEditorConfig(config);
+  }
+
+  render() {
+    if (!this.hass) {
+      return html``;
+    }
+
+    return html`
+      <ha-form
+        .hass=${this.hass}
+        .data=${this._config || {}}
+        .schema=${this._getSchema()}
+        .computeLabel=${this._computeLabel}
+        @value-changed=${this._onValueChanged}
+      ></ha-form>
+    `;
+  }
+
+  _getSchema() {
+    const isRollingWeek = (this._config?.menu_type || "week") === "rolling-week";
+    const schema = [
+      {
+        name: "entity",
+        required: true,
+        selector: { entity: { domain: "sensor", integration: "skolmat" } },
+      },
+      {
+        name: "menu_type",
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              { value: "today", label: "today" },
+              { value: "week", label: "week" },
+              { value: "rolling-week", label: "rolling-week" },
+            ],
+          },
+        },
+      },
+      {
+        name: "header",
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              { value: "full", label: "full" },
+              { value: "short", label: "short" },
+              { value: "school-name", label: "school-name" },
+              { value: "none", label: "none" },
+            ],
+          },
+        },
+      },
+      {
+        name: "header_font",
+        selector: { text: {} },
+      },
+      {
+        name: "header_fontsize",
+        selector: { text: {} },
+      },
+    ];
+
+    if (!isRollingWeek) {
+      schema.push({
+        name: "show_dates",
+        selector: { boolean: {} },
+      });
+    }
+
+    if (isRollingWeek) {
+      schema.push({
+        name: "rolling_week_max_days",
+        selector: {
+          number: {
+            mode: "box",
+            min: 1,
+            max: 10,
+            step: 1,
+          },
+        },
+      });
+    }
+
+    schema.push(
+      {
+        name: "show_meals",
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              { value: "none", label: "none" },
+              { value: "always", label: "always" },
+              { value: "if-multiple", label: "if-multiple" },
+            ],
+          },
+        },
+      },
+      {
+        name: "show_dish_labels",
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              { value: "none", label: "none" },
+              { value: "always", label: "always" },
+              { value: "if-multiple", label: "if-multiple" },
+            ],
+          },
+        },
+      },
+      {
+        name: "locale",
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              { value: "default", label: "default" },
+              { value: "en", label: "en" },
+              { value: "sv", label: "sv" },
+            ],
+          },
+        },
+      }
+    );
+
+    return schema;
+  }
+
+  _computeLabel(schema) {
+    const labels = {
+      entity: "Entity",
+      menu_type: "Menu type",
+      header: "Header",
+      header_font: "Header font URL (or 'none')",
+      header_fontsize: "Header font size",
+      show_dates: "Show dates",
+      rolling_week_max_days: "Rolling week max days",
+      show_meals: "Show meal headers",
+      show_dish_labels: "Show dish labels",
+      locale: "Locale",
+    };
+    return labels[schema.name] || schema.name;
+  }
+
+  _onValueChanged(event) {
+    const value = event.detail?.value;
+    if (!value) {
+      return;
+    }
+
+    const normalized = normalizeEditorConfig(value);
+
+    this._config = normalized;
+    this.dispatchEvent(
+      new CustomEvent("config-changed", {
+        detail: { config: normalized },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  static get styles() {
+    return css`
+      :host {
+        display: block;
+      }
+    `;
+  }
+}
+customElements.define("skolmat-card-editor", SkolmatCardEditor);
