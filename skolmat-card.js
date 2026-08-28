@@ -1,6 +1,33 @@
-const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("ha-panel-lovelace"));
-const html = window.html || LitElement.prototype.html;
-const css = window.css || LitElement.prototype.css;
+// Home Assistant does not expose Lit globally, so the base class has to be borrowed from an
+// element the frontend has already registered. "ha-panel-lovelace" only exists on a regular
+// dashboard: the Google Cast receiver renders through "hc-main" instead, so there
+// customElements.get("ha-panel-lovelace") is undefined and Object.getPrototypeOf() threw
+// "TypeError: Cannot convert undefined or null to object", which broke the card on every cast.
+// "hui-view" is the usual suggested fallback but is not a usable one -- it extends
+// ReactiveElement, which carries no html/css, so it silently yields undefined tag functions.
+const LIT_HOST_TAGS = ["ha-panel-lovelace", "hc-main", "home-assistant-main", "ha-card"];
+
+function findLitElement() {
+  for (const tag of LIT_HOST_TAGS) {
+    let cls = customElements.get(tag);
+    while (cls && cls.prototype) {
+      // HA patches html/css onto lit's LitElement.prototype for custom cards, so the class that
+      // owns them is the base we want, however deep the host element's own mixin chain goes.
+      if (Object.prototype.hasOwnProperty.call(cls.prototype, "html")) {
+        return cls;
+      }
+      cls = Object.getPrototypeOf(cls);
+    }
+  }
+  return null;
+}
+
+const LitElement = findLitElement();
+if (!LitElement) {
+  throw new Error("Skolmat card: unable to locate the Home Assistant Lit base class");
+}
+const html = LitElement.prototype.html;
+const css = LitElement.prototype.css;
 
 window.customCards = window.customCards || [];
 window.customCards.push({
